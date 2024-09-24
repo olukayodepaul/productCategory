@@ -1,16 +1,14 @@
 package dart.productCatelogMicroservice.product_category.darts_app.service;
 
-
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryDbModel;
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryReqModel;
-import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryResModel;
 import dart.productCatelogMicroservice.product_category.darts_app.helper.BuilderManager;
-import dart.productCatelogMicroservice.product_category.darts_app.repository.ProductCategoryRepo;
+import dart.productCatelogMicroservice.product_category.darts_app.repository.DeleteUpdateProductCategoryRepo;
 import dart.productCatelogMicroservice.product_category.darts_app.repository.RedisCacheService;
 import dart.productCatelogMicroservice.product_category.utilities.ErrorHandler;
 import dart.productCatelogMicroservice.product_category.utilities.MessageBrokerManager;
+import dart.productCatelogMicroservice.product_category.utilities.ResponseHandler;
 import dart.productCatelogMicroservice.product_category.utilities.RunTimeException;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -20,62 +18,71 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-@Service
-public class ProductCategoryImpl {
 
-    private final ProductCategoryRepo productCategoryRepo;
+@Service
+public class UpdateProductCategoryImpl {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeleteProductCategoryImpl.class);
+    public final DeleteUpdateProductCategoryRepo productCategoryRepo;
+    private final BuilderManager builderManager;
     private final RedisCacheService redisCacheService;
     private final MessageBrokerManager messageBrokerManager;
-    private final BuilderManager builderManager;
-    private static final Logger logger = LoggerFactory.getLogger(ProductCategoryImpl.class);
 
-    public ProductCategoryImpl(
-            ProductCategoryRepo productCategoryRepo,
+    public UpdateProductCategoryImpl(
+            DeleteUpdateProductCategoryRepo productCategoryRepo,
+            BuilderManager builderManager,
             RedisCacheService redisCacheService,
-            MessageBrokerManager messageBrokerManager,
-            BuilderManager builderManager
-    ) {
+            MessageBrokerManager messageBrokerManager)
+    {
         this.productCategoryRepo = productCategoryRepo;
+        this.builderManager = builderManager;
         this.redisCacheService = redisCacheService;
         this.messageBrokerManager = messageBrokerManager;
-        this.builderManager = builderManager;
     }
 
-    @Transactional
-    public ResponseEntity<ProductCategoryResModel> createProductCategory(ProductCategoryReqModel request) {
+    public ResponseEntity<ResponseHandler> updateProductCategory(ProductCategoryReqModel request, Integer productId) {
 
-        // Validate request parameters
         validateRequest(request);
 
-        // Check for existing category
-        Optional<ProductCategoryDbModel> dbListener = productCategoryRepo.findByName(request.getName().toLowerCase());
 
-        if (dbListener.isPresent()) {
-            logger.warn("Product Category already exists: {}", request.getName());
-            throw new RunTimeException(
-                    new ErrorHandler(false, "Product Category already exists!"),
-                    HttpStatus.CONFLICT
+        Optional<ProductCategoryDbModel> dbListener = productCategoryRepo.findById(productId);
+
+        if(dbListener.isPresent()) {
+
+            if(!dbListener.get().getIsactive()) {
+                throw new RunTimeException(
+                        new ErrorHandler(false, "The product category is inactive"),
+                        HttpStatus.CONFLICT
+                );
+            }
+
+            ProductCategoryDbModel dbResponse = dbListener.get();
+
+            ProductCategoryDbModel productCategoryBuilder = builderManager.dbBuilder(
+                    dbResponse.getId(),
+                    request.getName(),
+                    request.getDescription(),
+                    dbResponse.getParentid(),
+                    true,
+                    dbResponse.getCreatedat(),
+                    LocalDateTime.now()
             );
+
+            ProductCategoryDbModel updateCategory = saveAndUpdateCategory(productCategoryBuilder);
+
+            boolean cacheStatus = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.SingleCacheModelBuilder(updateCategory));
+
+            if (!cacheStatus) {
+                messageBrokerManager.PushTopicToMessageBroker("update", updateCategory);
+            }
+
+            return new ResponseEntity<>(new ResponseHandler(true, "Category successfully updated"), HttpStatus.CREATED);
         }
 
-        // Build and save the new product category
-        ProductCategoryDbModel productCategoryBuilder = builderManager.dbBuilder(
-                0,
-                request.getName().toLowerCase(),
-                request.getDescription(),
-                request.getParentid(),
-                true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+        throw new RunTimeException(
+                new ErrorHandler(false, "No product category is associated"),
+                HttpStatus.CONFLICT
         );
-        ProductCategoryDbModel createCategory = saveAndUpdateCategory(productCategoryBuilder);
-
-        boolean cacheStatus = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.SingleCacheModelBuilder(createCategory));
-        if (!cacheStatus) {
-            messageBrokerManager.PushTopicToMessageBroker("create",createCategory);
-        }
-
-        return new ResponseEntity<>(new ProductCategoryResModel(true, "Category successfully created", createCategory), HttpStatus.CREATED);
     }
 
     private void validateRequest(ProductCategoryReqModel request) {
@@ -110,7 +117,4 @@ public class ProductCategoryImpl {
             );
         }
     }
-
 }
-
-

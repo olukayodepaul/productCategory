@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageBrokerManager {
 
-    public void PushTopicToMessageBroker(ProductCategoryDbModel saveCategoryIntoDb){
+    public void PushTopicToMessageBroker(String eventChannel, ProductCategoryDbModel saveCategoryIntoDb){
 
     }
 

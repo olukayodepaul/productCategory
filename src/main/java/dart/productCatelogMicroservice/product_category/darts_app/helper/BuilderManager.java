@@ -2,6 +2,9 @@ package dart.productCatelogMicroservice.product_category.darts_app.helper;
 
 import dart.productCatelogMicroservice.product_category.darts_app.entity.CacheModel;
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryDbModel;
+import dart.productCatelogMicroservice.product_category.utilities.ErrorHandler;
+import dart.productCatelogMicroservice.product_category.utilities.RunTimeException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -40,15 +43,16 @@ public class BuilderManager {
                 .build();
     }
 
-    public ProductCategoryDbModel dbBuilder(String name, String description, String parentid){
+    public ProductCategoryDbModel dbBuilder(Integer id, String name, String description, String parentId, Boolean active, LocalDateTime createdAt, LocalDateTime updatedAt){
         return ProductCategoryDbModel
                 .builder()
+                .id(id)
                 .name(name)
                 .description(description)
-                .parentid(parentid)
-                .isactive(true)
-                .createdat(LocalDateTime.now())
-                .updatedat(LocalDateTime.now())
+                .parentid(parentId)
+                .isactive(active)
+                .createdat(createdAt)
+                .updatedat(updatedAt)
                 .build();
     }
 

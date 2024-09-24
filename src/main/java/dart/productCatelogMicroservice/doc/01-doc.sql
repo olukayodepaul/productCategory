@@ -16,23 +16,27 @@ Here’s a breakdown of typical endpoints for handling product categories:
    Parameters:
    limit (optional): Number of categories to fetch.
    offset (optional): For pagination.
+
 2. Get Category by ID
    Endpoint: GET /categories/{category_id}
    Description: Fetch details of a specific category using its ID.
    Path Parameters:
    category_id: The unique identifier of the category.
+
 3. Get Subcategories
    Endpoint: GET /categories/{category_id}/subcategories
    Description: Retrieve subcategories under a specific category.
    Path Parameters:
    category_id: The ID of the parent category.
-4. Create New Category
+
+4. Create New Category (done)
    Endpoint: POST /categories
    Description: Add a new category to the system.
    Body:
    category_name: Name of the category.
    parent_category_id (optional): ID of the parent category if it’s a subcategory.
    description (optional): Additional details about the category.
+
 5. Update Category
    Endpoint: PUT /categories/{category_id}
    Description: Update details of an existing category.
@@ -40,21 +44,25 @@ Here’s a breakdown of typical endpoints for handling product categories:
    category_id: ID of the category to be updated.
    Body:
    Fields like category_name, parent_category_id, or description.
-6. Delete Category
+
+6. Delete Category (done)
    Endpoint: DELETE /categories/{category_id}
    Description: Remove a category from the system.
    Path Parameters:
    category_id: The ID of the category to delete.
+
 7. Get Products in Category
    Endpoint: GET /categories/{category_id}/products
    Description: Fetch products under a specific category.
    Path Parameters:
    category_id: The unique identifier of the category.
+
 8. Search Categories
    Endpoint: GET /categories/search
    Description: Search for categories based on a keyword.
    Query Parameters:
    q: Search query or keyword.
+
 9. Get Popular Categories
    Endpoint: GET /categories/popular
    Description: Fetch a list of popular or trending categories.

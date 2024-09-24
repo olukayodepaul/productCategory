@@ -9,9 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface ProductCategoryRepo extends JpaRepository<ProductCategoryDbModel, Long> {
-
     Optional<ProductCategoryDbModel> findByName(String Name);
-
-//    @Query("SELECT pc FROM CreateSingleProductCategoryDbModel pc WHERE pc.parentCategory IS NULL")
-//    List<CreateSingleProductCategoryDbModel> findAllParentCategories();
 }

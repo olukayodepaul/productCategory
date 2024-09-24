@@ -25,4 +25,5 @@ public class ProductCategory {
         return productCategoryImpl.createProductCategory(bodyRequest);
     }
 
+
 }

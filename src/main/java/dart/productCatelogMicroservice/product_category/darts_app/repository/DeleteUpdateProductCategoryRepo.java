@@ -6,7 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface GetProductCategoryRepo extends JpaRepository<ProductCategoryDbModel, Long> {
 
+@Repository
+public interface DeleteUpdateProductCategoryRepo extends JpaRepository<ProductCategoryDbModel,Long> {
+    Optional<ProductCategoryDbModel> findById(Integer Id);
 }
