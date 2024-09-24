@@ -1,0 +1,169 @@
+Categories API Endpoints
+Create Category
+
+Endpoint: POST /api/categories
+Description: Creates a new category.
+Request Body:
+json
+Copy code
+{
+  "name": "Category Name",
+  "description": "Category Description",
+  "parent_id": null,
+  "is_active": true
+}
+
+Get All Categories
+Endpoint: GET /api/categories
+Description: Retrieves a list of all categories.
+
+Get Category by ID
+Endpoint: GET /api/categories/{id}
+Description: Retrieves a specific category by its ID.
+
+
+Update Category
+Endpoint: PUT /api/categories/{id}
+Description: Updates an existing category.
+Request Body:
+json
+Copy code
+{
+  "name": "Updated Category Name",
+  "description": "Updated Category Description",
+  "parent_id": 1,
+  "is_active": false
+}
+
+
+Delete Category
+Endpoint: DELETE /api/categories/{id}
+Description: Deletes a category by its ID.
+
+
+Get Subcategories
+Endpoint: GET /api/categories/{id}/subcategories
+Description: Retrieves all subcategories for a specific category.
+
+Activate/Deactivate Category
+Endpoint: PATCH /api/categories/{id}/status
+Description: Activates or deactivates a category.
+Request Body:
+json
+Copy code
+{
+  "is_active": false
+}
+Summary
+These endpoints allow for complete CRUD operations on categories while providing additional functionality for managing subcategories and activating/deactivating categories. Adjust the paths and methods as needed based on your specific application structure and design preferences.
+
+
+
+
+
+
+You said:
+are this all the endpoint
+ChatGPT said:
+ChatGPT
+These are the essential endpoints for managing categories in a typical RESTful API. However, depending on your specific requirements, you might consider adding a few more for enhanced functionality. Here are some additional endpoints you might find useful:
+
+Additional Categories API Endpoints
+
+Search Categories
+Endpoint: GET /api/categories/search
+Description: Searches for categories by name or description.
+Query Parameters: ?query=searchTerm
+
+Get Active Categories
+Endpoint: GET /api/categories/active
+Description: Retrieves a list of all active categories.
+
+Get Inactive Categories
+Endpoint: GET /api/categories/inactive
+Description: Retrieves a list of all inactive categories.
+
+Get Category Hierarchy
+Endpoint: GET /api/categories/hierarchy
+Description: Retrieves all categories in a hierarchical structure.
+
+Bulk Create Categories
+Endpoint: POST /api/categories/bulk
+Description: Creates multiple categories at once.
+Request Body:
+json
+Copy code
+[
+  {
+    "name": "Category 1",
+    "description": "Description 1",
+    "parent_id": null,
+    "is_active": true
+  },
+  {
+    "name": "Category 2",
+    "description": "Description 2",
+    "parent_id": 1,
+    "is_active": true
+  }
+]
+
+Bulk Update Categories
+Endpoint: PUT /api/categories/bulk
+Description: Updates multiple categories at once.
+Request Body:
+json
+Copy code
+[
+  {
+    "id": 1,
+    "name": "Updated Category 1",
+    "is_active": false
+  },
+  {
+    "id": 2,
+    "name": "Updated Category 2",
+    "is_active": true
+  }
+]
+
+
+
+
+To fetch all parent categories, you can add an endpoint specifically for that purpose. Here's how you could define it:
+
+Fetch All Parent Categories Endpoint
+Endpoint: GET /api/categories/parents
+Description: Retrieves a list of all categories that do not have a parent (i.e., top-level categories).
+Response:
+Returns an array of parent categories, which may include the following fields:
+json
+Copy code
+[
+  {
+    "id": 1,
+    "name": "Parent Category 1",
+    "description": "Description of Parent Category 1",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": 2,
+    "name": "Parent Category 2",
+    "description": "Description of Parent Category 2",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+]
+Example Query
+You would typically implement this endpoint by querying your categories table to find all categories where parent_id is NULL.
+
+SQL Query Example
+Here's a simple SQL query you might use to implement this endpoint:
+
+sql
+Copy code
+SELECT * FROM categories WHERE parent_id IS NULL AND is_active = TRUE;
+This query will retrieve all active parent categories. Adjust the SQL and endpoint implementation as needed to fit your application's requirements.
