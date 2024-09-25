@@ -2,9 +2,7 @@ package dart.productCatelogMicroservice.product_category.darts_app.helper;
 
 import dart.productCatelogMicroservice.product_category.darts_app.entity.CacheModel;
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryDbModel;
-import dart.productCatelogMicroservice.product_category.utilities.ErrorHandler;
-import dart.productCatelogMicroservice.product_category.utilities.RunTimeException;
-import org.springframework.http.HttpStatus;
+import dart.productCatelogMicroservice.product_category.utilities.UtilityManager;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -15,6 +13,12 @@ import java.util.stream.Collectors;
 
 @Component
 public class BuilderManager {
+
+    private final UtilityManager utilityManager;
+
+    public BuilderManager(UtilityManager utilityManager) {
+        this.utilityManager = utilityManager;
+    }
 
     public List<ProductCategoryDbModel> buildHierarchy(List<ProductCategoryDbModel> categories) {
         Map<String, List<ProductCategoryDbModel>> groupedByParent = categories.stream()
@@ -31,15 +35,15 @@ public class BuilderManager {
         return subCategories;
     }
 
-    public CacheModel SingleCacheModelBuilder(ProductCategoryDbModel savedProductCategory) {
+    public CacheModel CacheModelBuilder(ProductCategoryDbModel savedProductCategory) {
         return CacheModel.builder()
                 .id(savedProductCategory.getId())
                 .name(savedProductCategory.getName())
                 .description(savedProductCategory.getDescription())
                 .parentid(savedProductCategory.getParentid())
                 .isactive(savedProductCategory.getIsactive())
-                .createdat(savedProductCategory.getCreatedat())
-                .updatedat(savedProductCategory.getUpdatedat())
+                .createdat(utilityManager.DateToStringDate(savedProductCategory.getCreatedat()))
+                .updatedat(utilityManager.DateToStringDate(savedProductCategory.getUpdatedat()))
                 .build();
     }
 

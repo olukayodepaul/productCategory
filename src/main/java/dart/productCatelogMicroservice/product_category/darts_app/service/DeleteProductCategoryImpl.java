@@ -74,7 +74,7 @@ public class DeleteProductCategoryImpl {
 
             ProductCategoryDbModel onDeleteDbRecord = deleteProductCategory(productCategoryBuilder);
 
-            boolean onDeleteRecordInCache = redisCacheService.deleteProductCategoryFromCacheMemory(builderManager.SingleCacheModelBuilder(onDeleteDbRecord));
+            boolean onDeleteRecordInCache = redisCacheService.deleteProductCategoryFromCacheMemory(builderManager.CacheModelBuilder(onDeleteDbRecord));
 
             if (!onDeleteRecordInCache) {
                 messageBrokerManager.PushTopicToMessageBroker("delete", onDeleteDbRecord);

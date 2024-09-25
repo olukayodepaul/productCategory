@@ -70,7 +70,7 @@ public class CreateProductCategoryImpl {
         );
         ProductCategoryDbModel onSaveRecordInDb = saveProductCategory(productCategoryBuilder);
 
-        boolean onSaveRecordInCache = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.SingleCacheModelBuilder(onSaveRecordInDb));
+        boolean onSaveRecordInCache = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.CacheModelBuilder(onSaveRecordInDb));
 
         if (!onSaveRecordInCache) {
             messageBrokerManager.PushTopicToMessageBroker("create",onSaveRecordInDb);

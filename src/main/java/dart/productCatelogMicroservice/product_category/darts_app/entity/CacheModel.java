@@ -1,5 +1,6 @@
 package dart.productCatelogMicroservice.product_category.darts_app.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Data
@@ -27,8 +30,11 @@ public class CacheModel implements Serializable {
     private String description;
     private String parentid;
     private Boolean isactive;
-    private LocalDateTime createdat;
-    private  LocalDateTime updatedat;
+    private String createdat;
+    private  String updatedat;
+    public List<CacheModel> children = new ArrayList<>();
+
+
 
 }
 

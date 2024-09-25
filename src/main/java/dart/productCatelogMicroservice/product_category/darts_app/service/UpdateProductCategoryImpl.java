@@ -70,7 +70,7 @@ public class UpdateProductCategoryImpl {
 
             ProductCategoryDbModel onUpdateRecordInDb = updateProductCategory(productCategoryBuilder);
 
-            boolean onUpdateRecordInCache = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.SingleCacheModelBuilder(onUpdateRecordInDb));
+            boolean onUpdateRecordInCache = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.CacheModelBuilder(onUpdateRecordInDb));
 
             if (!onUpdateRecordInCache) {
                 messageBrokerManager.PushTopicToMessageBroker("update", onUpdateRecordInDb);
