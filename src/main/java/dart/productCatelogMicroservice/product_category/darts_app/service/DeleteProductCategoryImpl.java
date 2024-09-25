@@ -6,7 +6,7 @@ import dart.productCatelogMicroservice.product_category.darts_app.helper.Builder
 import dart.productCatelogMicroservice.product_category.darts_app.repository.DeleteUpdateProductCategoryRepo;
 import dart.productCatelogMicroservice.product_category.darts_app.repository.RedisCacheService;
 import dart.productCatelogMicroservice.product_category.utilities.ErrorHandler;
-import dart.productCatelogMicroservice.product_category.utilities.MessageBrokerManager;
+import dart.productCatelogMicroservice.product_category.darts_app.kafka.MessageBrokerManager;
 import dart.productCatelogMicroservice.product_category.utilities.ResponseHandler;
 import dart.productCatelogMicroservice.product_category.utilities.RunTimeException;
 import org.slf4j.Logger;
@@ -42,8 +42,8 @@ public class DeleteProductCategoryImpl {
         Optional<ProductCategoryDbModel> dbListener = productCategoryRepo.findById(categoryId);
 
         if(dbListener.isPresent()) {
-
-            //todo: gRPC call to ProductsMicroService to check if any active product is associated with the category id.
+            //todo: gRPC call to ProductMicroService confirming if any active product is associated with the category id.
+            //note cant delete a product category with associated product.
             Boolean grpcChannel = grpcManager.checkCategoryAssociation(categoryId);
 
             if (!grpcChannel) {
@@ -60,37 +60,36 @@ public class DeleteProductCategoryImpl {
                 );
             }
 
-            ProductCategoryDbModel dbResponse = dbListener.get();
+            ProductCategoryDbModel recordFetchFromDb = dbListener.get();
 
             ProductCategoryDbModel productCategoryBuilder = builderManager.dbBuilder(
-                    dbResponse.getId(),
-                    dbResponse.getName(),
-                    dbResponse.getDescription(),
-                    dbResponse.getParentid(),
+                    recordFetchFromDb.getId(),
+                    recordFetchFromDb.getName(),
+                    recordFetchFromDb.getDescription(),
+                    recordFetchFromDb.getParentid(),
                     false,
-                    dbResponse.getCreatedat(),
+                    recordFetchFromDb.getCreatedat(),
                     LocalDateTime.now()
             );
 
-            ProductCategoryDbModel updateCategory = saveAndUpdateCategory(productCategoryBuilder);
+            ProductCategoryDbModel onDeleteDbRecord = deleteProductCategory(productCategoryBuilder);
 
-            boolean cacheStatus = redisCacheService.deleteProductCategoryFromCacheMemory(builderManager.SingleCacheModelBuilder(updateCategory));
+            boolean onDeleteRecordInCache = redisCacheService.deleteProductCategoryFromCacheMemory(builderManager.SingleCacheModelBuilder(onDeleteDbRecord));
 
-            if (!cacheStatus) {
-                messageBrokerManager.PushTopicToMessageBroker("delete", updateCategory);
+            if (!onDeleteRecordInCache) {
+                messageBrokerManager.PushTopicToMessageBroker("delete", onDeleteDbRecord);
             }
-            return new ResponseEntity<>(new ResponseHandler(true, "Category successfully created"), HttpStatus.CREATED);
+            return new ResponseEntity<>(new ResponseHandler(true, "Category successfully deleted"), HttpStatus.CREATED);
         }
 
         throw new RunTimeException(
-                new ErrorHandler(false, "No product category is associated with the if"),
+                new ErrorHandler(false, "No product category is associated with the "),
                 HttpStatus.CONFLICT
         );
     }
 
     private void validateRequest(Integer request) {
         if (request == null) {
-            logger.error("DeleteProductCategoryImpl: Request is null");
             throw new RunTimeException(
                     new ErrorHandler(false, "Description is required."),
                     HttpStatus.BAD_REQUEST
@@ -98,7 +97,8 @@ public class DeleteProductCategoryImpl {
         }
     }
 
-    public ProductCategoryDbModel saveAndUpdateCategory(ProductCategoryDbModel productCategoryId) {
+    //note that the application is not deleting any record but change the status to false
+    private ProductCategoryDbModel deleteProductCategory(ProductCategoryDbModel productCategoryId) {
         try {
             return productCategoryRepo.save(productCategoryId);
         } catch (Exception e) {

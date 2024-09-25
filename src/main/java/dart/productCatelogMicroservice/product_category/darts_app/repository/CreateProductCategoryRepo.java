@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProductCategoryRepo extends JpaRepository<ProductCategoryDbModel, Long> {
+public interface CreateProductCategoryRepo extends JpaRepository<ProductCategoryDbModel, Long> {
     Optional<ProductCategoryDbModel> findByName(String Name);
 }

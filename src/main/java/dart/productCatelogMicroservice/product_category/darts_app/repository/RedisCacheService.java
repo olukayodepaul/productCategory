@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
 @Service
 public class RedisCacheService {
 
@@ -20,14 +19,11 @@ public class RedisCacheService {
 
     public Boolean saveUpdateProductCategoryInCacheMemory(CacheModel profile) {
         try {
-
             Integer productId = profile.getId();
             String key = "product:category";
             String subKey = productId.toString();
-
             redisTemplate.opsForHash().put(key, subKey, profile);
             return true;
-
         } catch (Exception e) {
             logger.info("product_category.darts_app.entity.ProductCategoryDbModel saveProfileCategoryInCacheMemory: {}", e.getMessage());
             return false;
@@ -36,18 +32,16 @@ public class RedisCacheService {
 
     public Boolean deleteProductCategoryFromCacheMemory(CacheModel productCategoryId) {
         try {
-
             Integer productId = productCategoryId.getId();
             String key = "product:category";
             String subKey = productId.toString();
-
-            Long result = redisTemplate.opsForHash().delete(key, subKey);
-
+            redisTemplate.opsForHash().delete(key, subKey);
             return true;
         } catch (Exception e) {
             logger.info("product_category.darts_app.entity.ProductCategoryDbModel deleteProductCategoryFromCacheMemory: {}", e.getMessage());
             return false;
         }
     }
+
 
 }

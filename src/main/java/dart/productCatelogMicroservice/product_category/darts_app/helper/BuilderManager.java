@@ -43,7 +43,15 @@ public class BuilderManager {
                 .build();
     }
 
-    public ProductCategoryDbModel dbBuilder(Integer id, String name, String description, String parentId, Boolean active, LocalDateTime createdAt, LocalDateTime updatedAt){
+    public ProductCategoryDbModel dbBuilder(
+            Integer id,
+            String name,
+            String description,
+            String parentId,
+            Boolean active,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {
         return ProductCategoryDbModel
                 .builder()
                 .id(id)

@@ -17,6 +17,7 @@ Get All Categories
 Endpoint: GET /api/categories
 Description: Retrieves a list of all categories.
 
+
 Get Category by ID
 Endpoint: GET /api/categories/{id}
 Description: Retrieves a specific category by its ID.
@@ -54,6 +55,8 @@ Copy code
 {
   "is_active": false
 }
+
+
 Summary
 These endpoints allow for complete CRUD operations on categories while providing additional functionality for managing subcategories and activating/deactivating categories. Adjust the paths and methods as needed based on your specific application structure and design preferences.
 

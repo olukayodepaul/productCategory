@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-public class DeleteUpdateProductController {
+public class DeleteUpdateProductCategoryController {
 
     private final DeleteProductCategoryImpl deleteImpl;
     private final UpdateProductCategoryImpl updateImpl;
 
-    public DeleteUpdateProductController(DeleteProductCategoryImpl deleteImpl, UpdateProductCategoryImpl updateImpl) {
+    public DeleteUpdateProductCategoryController(DeleteProductCategoryImpl deleteImpl, UpdateProductCategoryImpl updateImpl) {
         this.deleteImpl = deleteImpl;
         this.updateImpl = updateImpl;
     }

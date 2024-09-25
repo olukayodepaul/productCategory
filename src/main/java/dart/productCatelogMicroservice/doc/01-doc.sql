@@ -37,7 +37,7 @@ Here’s a breakdown of typical endpoints for handling product categories:
    parent_category_id (optional): ID of the parent category if it’s a subcategory.
    description (optional): Additional details about the category.
 
-5. Update Category
+5. Update Category (done)
    Endpoint: PUT /categories/{category_id}
    Description: Update details of an existing category.
    Path Parameters:
@@ -51,7 +51,7 @@ Here’s a breakdown of typical endpoints for handling product categories:
    Path Parameters:
    category_id: The ID of the category to delete.
 
-7. Get Products in Category
+7. Get Products in Category #sub product by id
    Endpoint: GET /categories/{category_id}/products
    Description: Fetch products under a specific category.
    Path Parameters:

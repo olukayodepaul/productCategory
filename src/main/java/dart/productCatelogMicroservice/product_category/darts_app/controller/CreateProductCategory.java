@@ -3,7 +3,7 @@ package dart.productCatelogMicroservice.product_category.darts_app.controller;
 
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryReqModel;
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryResModel;
-import dart.productCatelogMicroservice.product_category.darts_app.service.ProductCategoryImpl;
+import dart.productCatelogMicroservice.product_category.darts_app.service.CreateProductCategoryImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class ProductCategory {
+public class CreateProductCategory {
 
-    private final ProductCategoryImpl productCategoryImpl;
+    private final CreateProductCategoryImpl productCategoryImpl;
 
-    public ProductCategory(ProductCategoryImpl productCategoryImpl) {
+    public CreateProductCategory(CreateProductCategoryImpl productCategoryImpl) {
         this.productCategoryImpl = productCategoryImpl;
     }
 
@@ -24,6 +24,5 @@ public class ProductCategory {
     public ResponseEntity<ProductCategoryResModel> createProductCategory(@RequestBody ProductCategoryReqModel bodyRequest) {
         return productCategoryImpl.createProductCategory(bodyRequest);
     }
-
 
 }

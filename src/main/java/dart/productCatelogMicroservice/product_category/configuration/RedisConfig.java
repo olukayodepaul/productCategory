@@ -1,14 +1,12 @@
 package dart.productCatelogMicroservice.product_category.configuration;
 
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -40,7 +38,7 @@ public class RedisConfig {
     }
 
     @Bean
-    @Qualifier("stringToObject")
+    @Primary
     public RedisTemplate<String, Object> template() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory());
@@ -64,70 +62,3 @@ public class RedisConfig {
         return template;
     }
 }
-
-
-//package dart.productCatelogMicroservice.product_category.configuration;
-//
-//
-//import com.fasterxml.jackson.annotation.JsonAutoDetect;
-//import com.fasterxml.jackson.annotation.PropertyAccessor;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.fasterxml.jackson.databind.SerializationFeature;
-//import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-//import org.springframework.beans.factory.annotation.Qualifier;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-//import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
-//import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-//import org.springframework.data.redis.core.RedisTemplate;
-//import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-//import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-//import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-//import org.springframework.data.redis.serializer.StringRedisSerializer;
-//import redis.clients.jedis.JedisPoolConfig;
-//
-//
-//@Configuration
-//@EnableRedisRepositories
-//public class RedisConfig {
-//
-//    @Bean
-//    public JedisConnectionFactory connectionFactory() {
-//        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-//        configuration.setHostName("localhost");
-//        configuration.setPort(6379);
-//        configuration.setPassword("@admin123");
-//
-//        JedisPoolConfig poolConfig = new JedisPoolConfig();
-//        poolConfig.setMaxTotal(10);
-//        poolConfig.setMaxIdle(5);
-//        poolConfig.setMinIdle(1);
-//
-//        JedisClientConfiguration clientConfig = JedisClientConfiguration.builder().usePooling().poolConfig(poolConfig).build();
-//        return new JedisConnectionFactory(configuration, clientConfig);
-//    }
-//
-//    @Bean
-//    @Qualifier("objectToJson")
-//    public RedisTemplate<String, Object> cacheObjectToJsonTemplate() {
-//        RedisTemplate<String, Object> template = new RedisTemplate<>();
-//        template.setConnectionFactory(connectionFactory());
-//
-//        // Use StringRedisSerializer for keys
-//        template.setKeySerializer(new StringRedisSerializer());
-//        template.setHashKeySerializer(new StringRedisSerializer());
-//
-//        // Use GenericJackson2JsonRedisSerializer for values
-//        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-//        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-//
-//        template.setEnableTransactionSupport(true);
-//        template.afterPropertiesSet();
-//        return template;
-//    }
-//
-//
-
-//
-//}

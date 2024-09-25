@@ -6,7 +6,7 @@ import dart.productCatelogMicroservice.product_category.darts_app.helper.Builder
 import dart.productCatelogMicroservice.product_category.darts_app.repository.DeleteUpdateProductCategoryRepo;
 import dart.productCatelogMicroservice.product_category.darts_app.repository.RedisCacheService;
 import dart.productCatelogMicroservice.product_category.utilities.ErrorHandler;
-import dart.productCatelogMicroservice.product_category.utilities.MessageBrokerManager;
+import dart.productCatelogMicroservice.product_category.darts_app.kafka.MessageBrokerManager;
 import dart.productCatelogMicroservice.product_category.utilities.ResponseHandler;
 import dart.productCatelogMicroservice.product_category.utilities.RunTimeException;
 import org.slf4j.Logger;
@@ -56,24 +56,24 @@ public class UpdateProductCategoryImpl {
                 );
             }
 
-            ProductCategoryDbModel dbResponse = dbListener.get();
+            ProductCategoryDbModel recordFetchFromDb = dbListener.get();
 
             ProductCategoryDbModel productCategoryBuilder = builderManager.dbBuilder(
-                    dbResponse.getId(),
+                    recordFetchFromDb.getId(),
                     request.getName(),
                     request.getDescription(),
-                    dbResponse.getParentid(),
+                    recordFetchFromDb.getParentid(),
                     true,
-                    dbResponse.getCreatedat(),
+                    recordFetchFromDb.getCreatedat(),
                     LocalDateTime.now()
             );
 
-            ProductCategoryDbModel updateCategory = saveAndUpdateCategory(productCategoryBuilder);
+            ProductCategoryDbModel onUpdateRecordInDb = updateProductCategory(productCategoryBuilder);
 
-            boolean cacheStatus = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.SingleCacheModelBuilder(updateCategory));
+            boolean onUpdateRecordInCache = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.SingleCacheModelBuilder(onUpdateRecordInDb));
 
-            if (!cacheStatus) {
-                messageBrokerManager.PushTopicToMessageBroker("update", updateCategory);
+            if (!onUpdateRecordInCache) {
+                messageBrokerManager.PushTopicToMessageBroker("update", onUpdateRecordInDb);
             }
 
             return new ResponseEntity<>(new ResponseHandler(true, "Category successfully updated"), HttpStatus.CREATED);
@@ -106,7 +106,7 @@ public class UpdateProductCategoryImpl {
         }
     }
 
-    public ProductCategoryDbModel saveAndUpdateCategory(ProductCategoryDbModel productCategoryId) {
+    private ProductCategoryDbModel updateProductCategory(ProductCategoryDbModel productCategoryId) {
         try {
             return productCategoryRepo.save(productCategoryId);
         } catch (Exception e) {

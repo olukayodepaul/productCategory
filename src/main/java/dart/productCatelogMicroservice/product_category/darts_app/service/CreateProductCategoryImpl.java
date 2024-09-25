@@ -5,10 +5,10 @@ import dart.productCatelogMicroservice.product_category.darts_app.entity.Product
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryReqModel;
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryResModel;
 import dart.productCatelogMicroservice.product_category.darts_app.helper.BuilderManager;
-import dart.productCatelogMicroservice.product_category.darts_app.repository.ProductCategoryRepo;
+import dart.productCatelogMicroservice.product_category.darts_app.repository.CreateProductCategoryRepo;
 import dart.productCatelogMicroservice.product_category.darts_app.repository.RedisCacheService;
 import dart.productCatelogMicroservice.product_category.utilities.ErrorHandler;
-import dart.productCatelogMicroservice.product_category.utilities.MessageBrokerManager;
+import dart.productCatelogMicroservice.product_category.darts_app.kafka.MessageBrokerManager;
 import dart.productCatelogMicroservice.product_category.utilities.RunTimeException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -21,16 +21,16 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class ProductCategoryImpl {
+public class CreateProductCategoryImpl {
 
-    private final ProductCategoryRepo productCategoryRepo;
+    private final CreateProductCategoryRepo productCategoryRepo;
     private final RedisCacheService redisCacheService;
     private final MessageBrokerManager messageBrokerManager;
     private final BuilderManager builderManager;
-    private static final Logger logger = LoggerFactory.getLogger(ProductCategoryImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreateProductCategoryImpl.class);
 
-    public ProductCategoryImpl(
-            ProductCategoryRepo productCategoryRepo,
+    public CreateProductCategoryImpl(
+            CreateProductCategoryRepo productCategoryRepo,
             RedisCacheService redisCacheService,
             MessageBrokerManager messageBrokerManager,
             BuilderManager builderManager
@@ -68,14 +68,15 @@ public class ProductCategoryImpl {
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
-        ProductCategoryDbModel createCategory = saveAndUpdateCategory(productCategoryBuilder);
+        ProductCategoryDbModel onSaveRecordInDb = saveProductCategory(productCategoryBuilder);
 
-        boolean cacheStatus = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.SingleCacheModelBuilder(createCategory));
-        if (!cacheStatus) {
-            messageBrokerManager.PushTopicToMessageBroker("create",createCategory);
+        boolean onSaveRecordInCache = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.SingleCacheModelBuilder(onSaveRecordInDb));
+
+        if (!onSaveRecordInCache) {
+            messageBrokerManager.PushTopicToMessageBroker("create",onSaveRecordInDb);
         }
 
-        return new ResponseEntity<>(new ProductCategoryResModel(true, "Category successfully created", createCategory), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ProductCategoryResModel(true, "Category successfully created", onSaveRecordInDb), HttpStatus.CREATED);
     }
 
     private void validateRequest(ProductCategoryReqModel request) {
@@ -99,7 +100,7 @@ public class ProductCategoryImpl {
         }
     }
 
-    public ProductCategoryDbModel saveAndUpdateCategory(ProductCategoryDbModel productCategoryId) {
+    private ProductCategoryDbModel saveProductCategory(ProductCategoryDbModel productCategoryId) {
         try {
             return productCategoryRepo.save(productCategoryId);
         } catch (Exception e) {
