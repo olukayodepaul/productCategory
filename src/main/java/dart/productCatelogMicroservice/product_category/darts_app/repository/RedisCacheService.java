@@ -98,7 +98,12 @@ public class RedisCacheService {
 
     public static String convertToJSONString(List<CacheModel> categoryHierarchy) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(categoryHierarchy);
+        return replaceNullWithEmptyArray(objectMapper.writeValueAsString(categoryHierarchy));
     }
+
+    public static String replaceNullWithEmptyArray(String jsonString) {
+        return jsonString.replace("\"children\":null", "\"children\":[]");
+    }
+
 
 }

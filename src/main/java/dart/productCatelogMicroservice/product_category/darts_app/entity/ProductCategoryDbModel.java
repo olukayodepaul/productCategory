@@ -30,5 +30,12 @@ public class ProductCategoryDbModel {
     private String parentid;
     private LocalDateTime createdat;
     private  LocalDateTime updatedat;
+
+    @Transient
     public List<ProductCategoryDbModel> children = new ArrayList<>();
+
+
+
+
+
 }

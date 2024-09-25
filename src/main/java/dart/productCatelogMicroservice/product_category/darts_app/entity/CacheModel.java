@@ -33,10 +33,5 @@ public class CacheModel implements Serializable {
 
     // Initialize children as an empty list
     public List<CacheModel> children = new ArrayList<>();  // Always initialized
-
-    public List<CacheModel> getChildren() {
-        return children;
-    }
-
 }
 

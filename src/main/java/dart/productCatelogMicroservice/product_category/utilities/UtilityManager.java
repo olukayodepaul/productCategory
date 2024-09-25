@@ -13,7 +13,6 @@ public class UtilityManager {
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return dateTime.format(outputFormatter);
     }
-
 }
 
 
