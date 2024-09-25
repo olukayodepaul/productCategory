@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -18,6 +15,7 @@ import java.util.List;
 @Data
 @Builder
 @NoArgsConstructor
+@Getter
 @AllArgsConstructor
 @RedisHash("categories")
 public class CacheModel implements Serializable {
@@ -31,10 +29,14 @@ public class CacheModel implements Serializable {
     private String parentid;
     private Boolean isactive;
     private String createdat;
-    private  String updatedat;
-    public List<CacheModel> children = new ArrayList<>();
+    private String updatedat;
 
+    // Initialize children as an empty list
+    public List<CacheModel> children = new ArrayList<>();  // Always initialized
 
+    public List<CacheModel> getChildren() {
+        return children;
+    }
 
 }
 

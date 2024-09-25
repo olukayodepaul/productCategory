@@ -20,21 +20,6 @@ public class BuilderManager {
         this.utilityManager = utilityManager;
     }
 
-    public List<ProductCategoryDbModel> buildHierarchy(List<ProductCategoryDbModel> categories) {
-        Map<String, List<ProductCategoryDbModel>> groupedByParent = categories.stream()
-                .collect(Collectors.groupingBy(category ->
-                        category.getParentid() == null ? "root" : category.getParentid()));
-        return buildCategoryTree(groupedByParent, "root");
-    }
-
-    private List<ProductCategoryDbModel> buildCategoryTree(Map<String, List<ProductCategoryDbModel>> groupedByParent, String parentId) {
-        List<ProductCategoryDbModel> subCategories = groupedByParent.getOrDefault(parentId, new ArrayList<>());
-        for (ProductCategoryDbModel category : subCategories) {
-            category.setSubCategories(buildCategoryTree(groupedByParent, String.valueOf(category.getId())));
-        }
-        return subCategories;
-    }
-
     public CacheModel CacheModelBuilder(ProductCategoryDbModel savedProductCategory) {
         return CacheModel.builder()
                 .id(savedProductCategory.getId())
