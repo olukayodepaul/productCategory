@@ -42,7 +42,7 @@ public class DeleteProductCategoryImpl {
         Optional<ProductCategoryDbModel> dbListener = productCategoryRepo.findById(categoryId);
 
         if(dbListener.isPresent()) {
-            //todo: gRPC call to ProductMicroService confirming if any active product is associated with the category id.
+            //todo: gRPC call to ProductMicroService confirming if any active product is associated with the product category id.
             //note cant delete a product category with associated product.
             Boolean grpcChannel = grpcManager.checkCategoryAssociation(categoryId);
 

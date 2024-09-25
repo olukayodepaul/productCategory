@@ -1,5 +1,6 @@
 package dart.productCatelogMicroservice.product_category.darts_app.repository;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dart.productCatelogMicroservice.product_category.darts_app.entity.CacheModel;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -48,7 +49,6 @@ public class RedisCacheService {
             return false;
         }
     }
-
     public String getAllCachedRecords() {
         try {
             String pattern = "product:category";
@@ -64,12 +64,18 @@ public class RedisCacheService {
                 List<CacheModel> listOfCategory = addressMap.values().stream()
                         .map(value -> objectMapper.convertValue(value, CacheModel.class))
                         .collect(Collectors.toList());
-                return convertToJSONString(buildCategoryHierarchy(listOfCategory));
+
+                List<CacheModel> categoryHierarchy = buildCategoryHierarchy(listOfCategory);
+
+                String jsonString = convertToJSONString(categoryHierarchy);
+
+                redisTemplate.opsForValue().set("json:product:category", jsonString);
+                return jsonString;
             }
 
             return "";
         } catch (Exception e) {
-            logger.info("products a: {}", e.getMessage());
+            logger.info("Error retrieving cached records: {}", e.getMessage());
             return "";
         }
     }
@@ -81,29 +87,55 @@ public class RedisCacheService {
         List<CacheModel> rootCategories = new ArrayList<>();
         for (CacheModel category : categories) {
             if (category.getParentid() == null) {
-                rootCategories.add(category);  // top-level category
+                rootCategories.add(category);
             } else {
                 CacheModel parentCategory = categoryMap.get(Integer.parseInt(category.getParentid()));
-                // Initialize the children list if it's null
                 if (parentCategory != null) {
                     if (parentCategory.getChildren() == null) {
-                        parentCategory.setChildren(new ArrayList<>()); // Ensure children list is initialized
+                        parentCategory.setChildren(new ArrayList<>());
                     }
-                    parentCategory.getChildren().add(category);  // Add as child
+                    parentCategory.getChildren().add(category);
                 }
             }
         }
-        return rootCategories;  // return top-level categories with children attached
+        return rootCategories;
     }
 
     public static String convertToJSONString(List<CacheModel> categoryHierarchy) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        return replaceNullWithEmptyArray(objectMapper.writeValueAsString(categoryHierarchy));
+        String jsonString = objectMapper.writeValueAsString(categoryHierarchy);
+        return replaceNullWithEmptyArray(jsonString);
     }
 
     public static String replaceNullWithEmptyArray(String jsonString) {
         return jsonString.replace("\"children\":null", "\"children\":[]");
     }
 
+    public List<CacheModel> getCachedRecords() {
+        try {
+            String jsonString = (String) redisTemplate.opsForValue().get("json:product:category");
+
+            if (jsonString != null && !jsonString.isEmpty()) {
+
+                List<CacheModel> cachedRecords = objectMapper.readValue(jsonString, new TypeReference<List<CacheModel>>() {});
+
+                return cachedRecords.stream()
+                        .sorted(Comparator.comparing(CacheModel::getId))
+                        .peek(parent -> parent.setChildren(
+                                parent.getChildren() != null ?
+                                        parent.getChildren().stream()
+                                                .sorted(Comparator.comparing(CacheModel::getId))
+                                                .collect(Collectors.toList()) :
+                                        Collections.emptyList()))
+                        .collect(Collectors.toList());
+            }
+
+            return Collections.emptyList();
+        } catch (Exception e) {
+            logger.info("Error fetching cached records: {}", e.getMessage());
+            return Collections.emptyList();
+        }
+    }
 
 }
+

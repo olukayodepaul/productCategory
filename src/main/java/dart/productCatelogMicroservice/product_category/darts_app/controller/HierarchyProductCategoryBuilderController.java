@@ -2,6 +2,7 @@ package dart.productCatelogMicroservice.product_category.darts_app.controller;
 
 
 
+import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryHierarchyModel;
 import dart.productCatelogMicroservice.product_category.darts_app.service.HierarchyProductCategoryBuilderImpl;
 import dart.productCatelogMicroservice.product_category.utilities.ResponseHandler;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,8 @@ public class HierarchyProductCategoryBuilderController {
         this.hierarchyProductCategoryBuilder = hierarchyProductCategoryBuilder;
     }
 
-    @PostMapping("/categories/build")
-    public ResponseEntity<ResponseHandler> buildProductCategory() {
+    @PostMapping("/product/categories")
+    public ResponseEntity<ProductCategoryHierarchyModel> buildProductCategory() {
         return hierarchyProductCategoryBuilder.buildProductCategory();
     }
     

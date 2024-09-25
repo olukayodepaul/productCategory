@@ -1,7 +1,8 @@
 package dart.productCatelogMicroservice.product_category.darts_app.service;
 
+import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryHierarchyModel;
 import dart.productCatelogMicroservice.product_category.darts_app.repository.RedisCacheService;
-import dart.productCatelogMicroservice.product_category.utilities.ResponseHandler;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +16,8 @@ public class HierarchyProductCategoryBuilderImpl {
         this.redisCacheService = redisCacheService;
     }
 
-    public ResponseEntity<ResponseHandler> buildProductCategory() {
-        System.out.println(redisCacheService.getAllCachedRecords());
-        return null;
+    public ResponseEntity<ProductCategoryHierarchyModel> buildProductCategory() {
+        redisCacheService.getAllCachedRecords();
+        return new ResponseEntity<>(new ProductCategoryHierarchyModel(true, "Category successfully created", redisCacheService.getCachedRecords()), HttpStatus.CREATED);
     }
 }

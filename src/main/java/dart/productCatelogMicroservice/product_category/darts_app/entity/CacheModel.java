@@ -31,7 +31,6 @@ public class CacheModel implements Serializable {
     private String createdat;
     private String updatedat;
 
-    // Initialize children as an empty list
-    public List<CacheModel> children = new ArrayList<>();  // Always initialized
+    public List<CacheModel> children = new ArrayList<>();
 }
 
