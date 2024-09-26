@@ -52,7 +52,7 @@ public class ProductCategoryHierarchyImpl {
         if (cacheListener.getCategory().isEmpty()) {
             throw new RunTimeException(
                     new ErrorHandler(false, "Unable to fetch product category by ID. No product category is associated with this ID."),
-                    HttpStatus.INTERNAL_SERVER_ERROR
+                    HttpStatus.NOT_FOUND
             );
         }
 
@@ -62,7 +62,7 @@ public class ProductCategoryHierarchyImpl {
                         cacheListener.getMessage(),
                         cacheListener.getCategory()
                 ),
-                HttpStatus.CREATED
+                HttpStatus.OK
         );
     }
 
@@ -89,7 +89,7 @@ public class ProductCategoryHierarchyImpl {
         if (cacheListener.getCategory().isEmpty()) {
             throw new RunTimeException(
                     new ErrorHandler(false, "No base hierarchy can be fetched, nor is the root product category found."),
-                    HttpStatus.INTERNAL_SERVER_ERROR
+                    HttpStatus.NOT_FOUND
             );
         }
 
@@ -99,7 +99,7 @@ public class ProductCategoryHierarchyImpl {
                         cacheListener.getMessage(),
                         cacheListener.getCategory()
                 ),
-                HttpStatus.CREATED
+                HttpStatus.OK
         );
     }
 
@@ -122,7 +122,7 @@ public class ProductCategoryHierarchyImpl {
         if (cacheListener.getCategory().isEmpty()) {
             throw new RunTimeException(
                     new ErrorHandler(false, "No base hierarchy can be fetched, nor is the root product category found."),
-                    HttpStatus.INTERNAL_SERVER_ERROR
+                    HttpStatus.NOT_FOUND
             );
         }
 
@@ -132,7 +132,7 @@ public class ProductCategoryHierarchyImpl {
                         cacheListener.getMessage(),
                         cacheListener.getCategory()
                 ),
-                HttpStatus.CREATED
+                HttpStatus.OK
         );
     }
 

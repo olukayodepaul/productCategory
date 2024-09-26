@@ -1,6 +1,5 @@
 package dart.productCatelogMicroservice.product_category.darts_app.service;
 
-
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryDbModel;
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryReqModel;
 import dart.productCatelogMicroservice.product_category.darts_app.entity.ProductCategoryResModel;
@@ -20,6 +19,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing product category creation.
+ * This service handles the logic for creating new product categories,
+ * including validation, persistence, and caching.
+ */
 @Service
 public class CreateProductCategoryImpl {
 
@@ -29,6 +33,14 @@ public class CreateProductCategoryImpl {
     private final BuilderManager builderManager;
     private static final Logger logger = LoggerFactory.getLogger(CreateProductCategoryImpl.class);
 
+    /**
+     * Constructs a CreateProductCategoryImpl instance with the required dependencies.
+     *
+     * @param productCategoryRepo the repository for product categories
+     * @param redisCacheService the Redis cache service for product categories
+     * @param messageBrokerManager the message broker manager for handling messages
+     * @param builderManager the builder manager for constructing product category models
+     */
     public CreateProductCategoryImpl(
             CreateProductCategoryRepo productCategoryRepo,
             RedisCacheService redisCacheService,
@@ -41,9 +53,16 @@ public class CreateProductCategoryImpl {
         this.builderManager = builderManager;
     }
 
+    /**
+     * Creates a new product category based on the provided request model.
+     *
+     * @param request the request model containing details of the product category to create
+     * @return a ResponseEntity containing the response model for the created product category
+     *         along with the appropriate HTTP status code
+     * @throws RunTimeException if the request is invalid or if the category already exists
+     */
     @Transactional
     public ResponseEntity<ProductCategoryResModel> createProductCategory(ProductCategoryReqModel request) {
-
         // Validate request parameters
         validateRequest(request);
 
@@ -72,13 +91,20 @@ public class CreateProductCategoryImpl {
 
         boolean onSaveRecordInCache = redisCacheService.saveUpdateProductCategoryInCacheMemory(builderManager.CacheModelBuilder(onSaveRecordInDb));
 
+        // Send message to message broker if Redis cache service fails
         if (!onSaveRecordInCache) {
-            messageBrokerManager.PushTopicToMessageBroker("create",onSaveRecordInDb);
+            messageBrokerManager.PushTopicToMessageBroker("create", onSaveRecordInDb);
         }
 
         return new ResponseEntity<>(new ProductCategoryResModel(true, "Category successfully created", onSaveRecordInDb), HttpStatus.CREATED);
     }
 
+    /**
+     * Validates the request parameters for creating a product category.
+     *
+     * @param request the request model to validate
+     * @throws RunTimeException if the request is null or if required fields are missing
+     */
     private void validateRequest(ProductCategoryReqModel request) {
         if (request == null) {
             throw new RunTimeException(
@@ -100,18 +126,20 @@ public class CreateProductCategoryImpl {
         }
     }
 
+    /**
+     * Saves a product category to the database.
+     *
+     * @param productCategoryId the product category model to save
+     * @return the saved product category model
+     * @throws RunTimeException if an error occurs during the save operation
+     */
     private ProductCategoryDbModel saveProductCategory(ProductCategoryDbModel productCategoryId) {
         try {
             return productCategoryRepo.save(productCategoryId);
         } catch (Exception e) {
-            logger.error("Error saving Product Category: {}", e.getMessage());
-            throw new RunTimeException(
-                    new ErrorHandler(false, "Unable to save your record at this time."),
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            logger.error("CreateProductCategoryImpl createProductCategory: Error creating category: {}", e.getMessage(), e);
+            throw new RunTimeException(new ErrorHandler(false, "Unable to save your record at this time."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 }
-
-
