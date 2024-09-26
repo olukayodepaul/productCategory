@@ -26,7 +26,7 @@ public class CacheModel implements Serializable {
 
     private String name;
     private String description;
-    private String parentid;
+    private Integer parentid;
     private Boolean isactive;
     private String createdat;
     private String updatedat;

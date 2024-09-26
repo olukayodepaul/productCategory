@@ -13,6 +13,6 @@ import lombok.Setter;
 public class ProductCategoryReqModel {
     private String name;
     private String description;
-    private String parentid;
+    private Integer parentid;
     private String isactive;
 }

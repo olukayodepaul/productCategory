@@ -27,7 +27,7 @@ public class ProductCategoryDbModel {
     private String name;
     private String description;
     private Boolean isactive;
-    private String parentid;
+    private Integer parentid = 0;
     private LocalDateTime createdat;
     private  LocalDateTime updatedat;
 
